@@ -9,7 +9,7 @@ __global__ void calculate_sum_of_tan_xy(unsigned int num_points, Point3D *points
   __shared__ Point3D *point;
   double sum = 0;
   for (unsigned int k = 0; k < num_points; k++) {
-    point = &points[k + j * num_points + i * num_points * num_points];
+    point = &points[k * num_points * num_points + j * num_points + i];
     sum += tan(point->x + point->y + point->z);
   }
 
@@ -37,7 +37,9 @@ int main() {
   double *gpu_result;
   CUDA_CHK(cudaMalloc((void **)&gpu_result, num_points_3d * sizeof(double)));
 
-  calculate_sum_of_tan_xy<<<grid_dim_cube, block_dim_cube>>>(num_points_3d, d_points_3d, gpu_result);
+  dim3 grid_dim_matrix(num_points_3d, num_points_3d, 1);
+
+  calculate_sum_of_tan_xy<<<grid_dim_matrix, block_dim_cube>>>(num_points_3d, d_points_3d, gpu_result);
   CUDA_CHK(cudaGetLastError());
   CUDA_CHK(cudaDeviceSynchronize());
 
@@ -48,4 +50,7 @@ int main() {
 
   free(result);
   CUDA_CHK(cudaFree(gpu_result));
+  CUDA_CHK(cudaFree(d_points_3d));
+
+  return 0;
 }

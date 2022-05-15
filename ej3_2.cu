@@ -9,7 +9,7 @@ __global__ void calculate_sum_of_tan_xz(unsigned int num_points, Point3D *points
   __shared__ Point3D *point;
   double sum = 0;
   for (unsigned int j = 0; j < num_points; j++) {
-    point = &points[k + j * num_points + i * num_points * num_points];
+    point = &points[k * num_points * num_points + j * num_points + i];
     sum += tan(point->x + point->y + point->z);
   }
 
@@ -48,4 +48,7 @@ int main() {
 
   free(result);
   CUDA_CHK(cudaFree(gpu_result));
+  CUDA_CHK(cudaFree(d_points_3d));
+
+  return 0;
 }

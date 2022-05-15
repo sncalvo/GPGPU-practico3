@@ -49,4 +49,7 @@ int main() {
 
   free(tan_result);
   CUDA_CHK(cudaFree(gpu_tan_result));
+  CUDA_CHK(cudaFree(d_points_3d));
+
+  return 0;
 }
