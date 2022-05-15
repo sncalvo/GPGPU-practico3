@@ -16,7 +16,7 @@
 
 #define SQUARE_LENGTH 2 * PI
 #define SMALL_POINT_SIZE 0.001
-#define BIG_POINT_SIZE 1.0
+#define BIG_POINT_SIZE 0.1
 // #define BIG_POINT_SIZE 0.01
 
 #define CUDA_CHK(ans) { gpuAssert((ans), __FILE__, __LINE__); }

@@ -24,8 +24,8 @@ int main() {
   CUDA_CHK(cudaMalloc(&d_points_3d, num_points_3d * num_points_3d * num_points_3d * sizeof(Point3D)));
 
   // Generates points inside a cube
-  dim3 block_dim_cube(1, 1, 1);
-  dim3 grid_dim_cube(num_points_3d, num_points_3d, num_points_3d);
+  dim3 block_dim_cube(8, 8, 8);
+  dim3 grid_dim_cube(num_points_3d / 8, num_points_3d / 8, num_points_3d / 8);
   generate_cube<<<grid_dim_cube, block_dim_cube>>>(d_points_3d, num_points_3d);
   CUDA_CHK(cudaGetLastError());
   CUDA_CHK(cudaDeviceSynchronize());
@@ -37,7 +37,10 @@ int main() {
   double *gpu_result;
   CUDA_CHK(cudaMalloc((void **)&gpu_result, num_points_3d * sizeof(double)));
 
-  calculate_sum_of_tan_yz<<<grid_dim_cube, block_dim_cube>>>(num_points_3d, d_points_3d, gpu_result);
+  dim3 block_dim_matrix(32, 32, 1);
+  dim3 grid_dim_matrix(num_points_3d / 32, num_points_3d / 32, 1);
+
+  calculate_sum_of_tan_yz<<<grid_dim_matrix, block_dim_matrix>>>(num_points_3d, d_points_3d, gpu_result);
   CUDA_CHK(cudaGetLastError());
   CUDA_CHK(cudaDeviceSynchronize());
 
