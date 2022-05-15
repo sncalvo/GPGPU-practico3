@@ -51,7 +51,7 @@ int main() {
   printf("sin_result: with points %d \n", num_points_2d * num_points_2d);
   printf("Print only first X rows\n");
 
-  print_matrix_of_points_with_origin(points_2d, sin_result, 64);
+  // print_matrix_of_points_with_origin(points_2d, sin_result, 64);
 
   free(sin_result);
   free(points_2d);

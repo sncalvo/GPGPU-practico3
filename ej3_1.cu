@@ -47,7 +47,7 @@ int main() {
   double *result = (double *)malloc(num_points_3d * sizeof(double));
   CUDA_CHK(cudaMemcpy(result, gpu_result, num_points_3d * sizeof(double), cudaMemcpyDeviceToHost));
 
-  print_matrix_of_points(result, 8);
+  // print_matrix_of_points(result, 8);
 
   free(result);
   CUDA_CHK(cudaFree(gpu_result));

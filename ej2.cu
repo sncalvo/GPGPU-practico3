@@ -45,7 +45,7 @@ int main() {
   double *tan_result = (double *)malloc(num_points_3d * sizeof(double));
   CUDA_CHK(cudaMemcpy(tan_result, gpu_tan_result, num_points_3d * sizeof(double), cudaMemcpyDeviceToHost));
 
-  print_matrix_of_points(tan_result, 8);
+  // print_matrix_of_points(tan_result, 8);
 
   free(tan_result);
   CUDA_CHK(cudaFree(gpu_tan_result));

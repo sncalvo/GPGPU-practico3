@@ -94,7 +94,7 @@ int main() {
   double *special_sum_result = (double *)malloc(num_points_2d * num_points_2d * sizeof(double));
   CUDA_CHK(cudaMemcpy(special_sum_result, gpu_special_sum_result, num_points_2d * num_points_2d * sizeof(double), cudaMemcpyDeviceToHost));
 
-  print_matrix_of_points(special_sum_result, 64);
+  // print_matrix_of_points(special_sum_result, 64);
 
   free(special_sum_result);
   CUDA_CHK(cudaFree(d_sin_result));
