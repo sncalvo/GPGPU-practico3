@@ -35,7 +35,7 @@ int main() {
 
   // Execute tan calculation
   double *gpu_result;
-  CUDA_CHK(cudaMalloc((void **)&gpu_result, num_points_3d * sizeof(double)));
+  CUDA_CHK(cudaMalloc((void **)&gpu_result, num_points_3d * num_points_3d * sizeof(double)));
 
   dim3 block_dim_matrix(32, 32, 1);
   dim3 grid_dim_matrix(num_points_3d / 32, num_points_3d / 32, 1);
@@ -44,8 +44,8 @@ int main() {
   CUDA_CHK(cudaGetLastError());
   CUDA_CHK(cudaDeviceSynchronize());
 
-  double *result = (double *)malloc(num_points_3d * sizeof(double));
-  CUDA_CHK(cudaMemcpy(result, gpu_result, num_points_3d * sizeof(double), cudaMemcpyDeviceToHost));
+  double *result = (double *)malloc(num_points_3d * num_points_3d * sizeof(double));
+  CUDA_CHK(cudaMemcpy(result, gpu_result, num_points_3d * num_points_3d * sizeof(double), cudaMemcpyDeviceToHost));
 
   // print_matrix_of_points(result, 8);
 
