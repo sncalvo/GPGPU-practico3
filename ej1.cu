@@ -6,13 +6,9 @@ __global__ void calculate_sin(unsigned int num_points, Point2D *points, double *
   unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
   unsigned int j = blockIdx.y * blockDim.y + threadIdx.y;
 
-  __shared__ Point2D *point;
-  point = &points[j + i * num_points];
+  Point2D point = points[j + i * num_points];
 
-  double x = point->x;
-  double y = point->y;
-
-  sin_result[j + i * num_points] = sin(x + y);
+  sin_result[j + i * num_points] = sin(point.x + point.y);
 }
 
 int main() {

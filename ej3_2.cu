@@ -6,7 +6,7 @@ __global__ void calculate_sum_of_tan_xz(unsigned int num_points, Point3D *points
   unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
   unsigned int k = blockIdx.y * blockDim.y + threadIdx.y;
 
-  __shared__ Point3D *point;
+  Point3D *point;
   double sum = 0;
   for (unsigned int j = 0; j < num_points; j++) {
     point = &points[k * num_points * num_points + j * num_points + i];
