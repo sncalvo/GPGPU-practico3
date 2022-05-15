@@ -105,4 +105,4 @@ void print_matrix_of_points3D(double *points, int n) {
   printf("\n");
 }
 
-#endif COMMON_H
+#endif
