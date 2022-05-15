@@ -1,107 +1,5 @@
-#include <math.h>
-#include <iostream>
-
-#include <stdlib.h>
-#include "cuda.h"
-
-#include <locale.h>
-
-#define BLOCK_SIZE 16
-#define PI 3.14159265358
-
-#define SQUARE_LENGTH 2 * PI
-#define SMALL_POINT_SIZE 0.001
-#define BIG_POINT_SIZE 1.0
-// #define BIG_POINT_SIZE 0.01
-
-#define CUDA_CHK(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-
-inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
-{
-   if (code != cudaSuccess)
-   {
-      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
-      if (abort) exit(code);
-   }
-}
-
-struct Point2D {
-  double x;
-  double y;
-};
-
-struct Point3D {
-  double x;
-  double y;
-  double z;
-};
-
-void print_matrix_of_points(Point2D *points, int n) {
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      std::cout << points[i * n + j].x << ", " << points[i * n + j].y << " ";
-    }
-    std::cout << std::endl;
-  }
-
-  std::cout << std::endl;
-}
-
-void print_matrix_of_points(Point3D *points, int n) {
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      for (int k = 0; k < n; k++) {
-        std::cout << points[i * n * n + j * n + k].x << ", " << points[i * n * n + j * n + k].y << ", " << points[i * n * n + j * n + k].z << " ";
-      }
-      std::cout << std::endl;
-    }
-  }
-
-  std::cout << std::endl;
-}
-
-void print_matrix_of_points(double *points, int n) {
-  std::cout << "Begin printing matrix of points" << std::endl;
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      std::cout << points[i * n + j] << " ";
-    }
-    std::cout << std::endl;
-  }
-  std::cout << "End printing matrix of points" << std::endl;
-}
-
-void print_matrix_of_points3D(double *points, int n) {
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      for (int k = 0; k < n; k++) {
-        std::cout << points[i * n * n + j * n + k] << " ";
-      }
-      std::cout << std::endl;
-    }
-  }
-
-  std::cout << std::endl;
-}
-
-__global__ void generate_square(Point2D *points, unsigned int n) {
-  unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
-  unsigned int j = blockIdx.y * blockDim.y + threadIdx.y;
-
-  if (i < n && j < n) {
-    points[j + i * n] = {j * SMALL_POINT_SIZE - PI, i * SMALL_POINT_SIZE - PI};
-  }
-}
-
-__global__ void generate_cube(Point3D *points, int n) {
-  unsigned int i = blockIdx.x;
-  unsigned int j = blockIdx.y;
-  unsigned int k = blockIdx.z;
-
-  if (i < n && j < n && k < n) {
-    points[i * n * n + j * n + k] = {i * BIG_POINT_SIZE - PI, j * BIG_POINT_SIZE - PI, k * BIG_POINT_SIZE - PI};
-  }
-}
+#include "./common.h"
+#include "./generator.cuh"
 
 // calculate_sin: Calculates sin of x and y coordinates for points inside a square
 __global__ void calculate_sin(unsigned int num_points, Point2D *points, double *sin_result) {
@@ -126,8 +24,6 @@ __global__ void calculate_tan(unsigned int num_points, Point3D *points, double *
   __shared__ Point3D *point;
   point = &points[i + j * num_points + k * num_points * num_points];
 
-  __syncthreads();
-
   double x = point->x;
   double y = point->y;
   double z = point->z;
@@ -143,7 +39,7 @@ __global__ void calculate_sum_of_tan_xy(unsigned int num_points, Point3D *points
   __shared__ Point3D *point;
   double sum = 0;
   for (unsigned int k = 0; k < num_points; k++) {
-    point = &points[i + j * num_points + k * num_points * num_points];
+    point = &points[k + j * num_points + i * num_points * num_points];
     sum += tan(point->x + point->y + point->z);
   }
 
@@ -158,7 +54,7 @@ __global__ void calculate_sum_of_tan_xz(unsigned int num_points, Point3D *points
   __shared__ Point3D *point;
   double sum = 0;
   for (unsigned int j = 0; j < num_points; j++) {
-    point = &points[i + j * num_points + k * num_points * num_points];
+    point = &points[k + j * num_points + i * num_points * num_points];
     sum += tan(point->x + point->y + point->z);
   }
 
@@ -172,7 +68,7 @@ __global__ void calculate_sum_of_tan_yz(unsigned int num_points, Point3D *points
   __shared__ Point3D *point;
   double sum = 0;
   for (unsigned int i = 0; i < num_points; i++) {
-    point = &points[i + j * num_points + k * num_points * num_points];
+    point = &points[k + j * num_points + i * num_points * num_points];
     sum += tan(point->x + point->y + point->z);
   }
 
